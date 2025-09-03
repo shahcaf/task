@@ -1,0 +1,336 @@
+/* General Styles */
+body {
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    background-color: #f5f5f5;
+    color: #333;
+    line-height: 1.6;
+    margin: 0;
+    padding: 0;
+    min-height: 100vh;
+}
+
+/* Main App */
+#app {
+    display: block;
+    min-height: 100vh;
+    background-color: #f8f9fa;
+}
+
+/* Login Page */
+.login-page {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    min-height: 100vh;
+    background: linear-gradient(135deg, #3498db, #2c3e50);
+    margin: 0;
+    padding: 20px;
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    z-index: 1000;
+}
+
+.login-container {
+    background: white;
+    border-radius: 10px;
+    box-shadow: 0 10px 25px rgba(0, 0, 0, 0.2);
+    width: 100%;
+    max-width: 400px;
+    padding: 30px;
+}
+
+.login-header {
+    text-align: center;
+    margin-bottom: 30px;
+}
+
+.login-header h1 {
+    color: #2c3e50;
+    margin: 0 0 10px;
+    font-weight: 600;
+}
+
+.login-header p {
+    color: #7f8c8d;
+    margin: 0;
+}
+
+.login-form .form-control {
+    border-radius: 5px;
+    padding: 12px 15px;
+    margin-bottom: 20px;
+    border: 1px solid #ddd;
+    transition: all 0.3s;
+}
+
+.login-form .form-control:focus {
+    border-color: #3498db;
+    box-shadow: 0 0 0 0.2rem rgba(52, 152, 219, 0.25);
+}
+
+.login-form .btn {
+    width: 100%;
+    padding: 12px;
+    font-size: 16px;
+    font-weight: 600;
+    border-radius: 5px;
+    margin-top: 10px;
+}
+
+.login-footer {
+    text-align: center;
+    margin-top: 20px;
+    font-size: 14px;
+    color: #7f8c8d;
+}
+
+.login-footer .badge {
+    font-size: 12px;
+    padding: 5px 8px;
+    margin: 0 5px;
+}
+
+/* Navigation */
+.navbar {
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    margin-bottom: 20px;
+}
+
+.navbar-brand {
+    font-weight: bold;
+    font-size: 1.5rem;
+}
+
+/* Schedule Table */
+.table {
+    background-color: white;
+    border-radius: 10px;
+    overflow: hidden;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+}
+
+.table thead th {
+    background-color: #2c3e50;
+    color: white;
+    font-weight: 500;
+    text-align: center;
+    vertical-align: middle;
+    white-space: nowrap;
+}
+
+.table tbody td {
+    vertical-align: middle;
+    text-align: center;
+    transition: all 0.2s;
+    position: relative;
+    min-width: 120px;
+    height: 80px;
+    cursor: pointer;
+}
+
+.table tbody td:hover {
+    background-color: #f8f9fa;
+}
+
+.lesson {
+    padding: 5px;
+    border-radius: 5px;
+    background-color: #e9f7fe;
+    border: 1px solid #b3e0ff;
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+}
+
+.lesson .subject {
+    font-weight: bold;
+    margin-bottom: 3px;
+}
+
+.lesson .teacher {
+    font-size: 0.85em;
+    color: #555;
+}
+
+/* Admin View */
+#admin-view {
+    max-width: 600px;
+    margin: 0 auto;
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+    .navbar-brand {
+        font-size: 1.2rem;
+    }
+    
+    .table {
+        font-size: 0.85rem;
+    }
+    
+    .table tbody td {
+        height: 60px;
+        padding: 2px;
+    }
+    
+    .lesson .subject, 
+    .lesson .teacher {
+        font-size: 0.7rem;
+        margin: 0;
+        line-height: 1.1;
+    }
+}
+
+/* Animations */
+@keyframes fadeIn {
+    from { opacity: 0; transform: translateY(10px); }
+    to { opacity: 1; transform: translateY(0); }
+}
+
+.fade-in {
+    animation: fadeIn 0.3s ease-out forwards;
+}
+
+/* Utility Classes */
+.d-none {
+    display: none !important;
+}
+
+.text-center {
+    text-align: center;
+}
+
+.mb-4 {
+    margin-bottom: 1.5rem !important;
+}
+
+.mt-4 {
+    margin-top: 1.5rem !important;
+}
+
+/* Form Controls */
+.form-select, .form-control {
+    border-radius: 5px;
+    padding: 10px 15px;
+    border: 1px solid #ddd;
+    transition: border-color 0.3s;
+}
+
+.form-select:focus, .form-control:focus {
+    border-color: #3498db;
+    box-shadow: 0 0 0 0.25rem rgba(52, 152, 219, 0.25);
+}
+
+/* Buttons */
+.btn {
+    border-radius: 5px;
+    padding: 8px 16px;
+    font-weight: 500;
+    transition: all 0.3s ease;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 5px;
+}
+
+/* Undo Button */
+.btn-warning {
+    background-color: #ffc107;
+    border-color: #ffc107;
+    color: #212529;
+}
+
+.btn-warning:hover {
+    background-color: #e0a800;
+    border-color: #d39e00;
+    color: #212529;
+}
+
+/* Toast Notifications */
+.toast-container {
+    z-index: 1090;
+    width: 100%;
+    max-width: 350px;
+}
+
+.toast {
+    box-shadow: 0 0.5rem 1rem rgba(0, 0, 0, 0.15);
+    border: none;
+    border-radius: 0.5rem;
+    overflow: hidden;
+}
+
+.toast-header {
+    border-bottom: none;
+    padding: 0.5rem 1rem;
+}
+
+.toast-body {
+    padding: 1rem;
+}
+
+/* Animation for toast */
+@keyframes slideInUp {
+    from {
+        transform: translate3d(0, 100%, 0);
+        visibility: visible;
+        opacity: 0;
+    }
+    to {
+        transform: translate3d(0, 0, 0);
+        opacity: 1;
+    }
+}
+
+.toast.show {
+    animation: slideInUp 0.3s ease-out;
+}
+
+.btn-primary {
+    background-color: #3498db;
+    border-color: #3498db;
+}
+
+.btn-primary:hover {
+    background-color: #2980b9;
+    border-color: #2980b9;
+}
+
+.btn-success {
+    background-color: #2ecc71;
+    border-color: #2ecc71;
+}
+
+.btn-success:hover {
+    background-color: #27ae60;
+    border-color: #27ae60;
+}
+
+.btn-danger {
+    background-color: #e74c3c;
+    border-color: #e74c3c;
+}
+
+.btn-danger:hover {
+    background-color: #c0392b;
+    border-color: #c0392b;
+}
+
+/* Alerts */
+.alert {
+    border-radius: 5px;
+    border: none;
+    padding: 12px 20px;
+    margin-bottom: 20px;
+}
+
+/* Badges */
+.badge {
+    font-weight: 500;
+    padding: 5px 10px;
+    border-radius: 4px;
+}

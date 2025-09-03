@@ -1,0 +1,140 @@
+{% extends "base.html" %}
+
+{% block content %}
+<h1 class="text-center mb-4">מערכת שעות כיתתית</h1>
+
+<div class="table-responsive">
+    <table class="table table-bordered table-hover text-center">
+        <thead class="table-dark">
+            <tr>
+                <th>שעה</th>
+                {% for day in days %}
+                    <th>{{ day }}</th>
+                {% endfor %}
+            </tr>
+        </thead>
+        <tbody>
+            {% for time_slot in time_slots %}
+                <tr>
+                    <td class="time-cell">{{ time_slot[0] }} - {{ time_slot[1] }}</td>
+                    {% for day in days %}
+                        {% set time_key = "%s-%s"|format(time_slot[0], time_slot[1]) %}
+                        {% set item = schedule[day][time_key] %}
+                        <td class="schedule-cell {% if item %}has-lesson{% endif %}" 
+                            {% if user_role in ['admin', 'mod'] and item %}
+                                onclick="window.location.href='{{ url_for('edit_schedule', schedule_id=item.id) }}'"
+                                style="cursor: pointer;"
+                            {% endif %}>
+                            {% if item %}
+                                <div class="lesson-details">
+                                    <div class="subject">{{ item.subject }}</div>
+                                    <div class="teacher">{{ item.teacher }}</div>
+                                </div>
+                                {% if user_role == 'admin' %}
+                                    <form action="{{ url_for('delete_schedule', schedule_id=item.id) }}" method="POST" class="d-inline" onsubmit="return confirm('האם אתה בטוח שברצונך למחוק שיעור זה?');">
+                                        <button type="submit" class="btn btn-sm btn-danger delete-btn" title="מחיקה">
+                                            <i class="fas fa-trash"></i>
+                                        </button>
+                                    </form>
+                                {% endif %}
+                            {% else %}
+                                {% if user_role in ['admin', 'mod'] %}
+                                    <a href="{{ url_for('add_schedule') }}?day={{ day }}&start_time={{ time_slot[0] }}&end_time={{ time_slot[1] }}" 
+                                       class="btn btn-sm btn-outline-secondary add-lesson-btn" 
+                                       title="הוסף שיעור">
+                                        <i class="fas fa-plus"></i>
+                                    </a>
+                                {% else %}
+                                    -
+                                {% endif %}
+                            {% endif %}
+                        </td>
+                    {% endfor %}
+                </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
+
+{% if user_role == 'admin' %}
+    <div class="mt-4">
+        <h4>שעות נוספות (15:00–17:00):</h4>
+        <p>הכנה לחיים (ימים א–ה עם אילה/עדי)</p>
+    </div>
+{% endif %}
+
+{% endblock %}
+
+{% block extra_css %}
+<style>
+    .schedule-cell {
+        min-width: 120px;
+        height: 80px;
+        vertical-align: middle;
+        position: relative;
+    }
+    
+    .schedule-cell.has-lesson {
+        background-color: #e8f4f8;
+    }
+    
+    .schedule-cell:hover {
+        background-color: #f0f8ff !important;
+    }
+    
+    .time-cell {
+        font-weight: bold;
+        background-color: #f8f9fa;
+        white-space: nowrap;
+    }
+    
+    .lesson-details {
+        padding: 5px;
+    }
+    
+    .subject {
+        font-weight: bold;
+        margin-bottom: 3px;
+    }
+    
+    .teacher {
+        font-size: 0.9em;
+        color: #555;
+    }
+    
+    .delete-btn {
+        position: absolute;
+        top: 2px;
+        left: 2px;
+        padding: 0.1rem 0.3rem;
+        font-size: 0.7rem;
+        line-height: 1;
+    }
+    
+    .add-lesson-btn {
+        opacity: 0.3;
+        transition: opacity 0.2s;
+    }
+    
+    .schedule-cell:hover .add-lesson-btn {
+        opacity: 1;
+    }
+    
+    @media (max-width: 768px) {
+        .table-responsive {
+            font-size: 0.8rem;
+        }
+        
+        .schedule-cell {
+            height: 60px;
+            padding: 2px;
+        }
+        
+        .subject, .teacher {
+            font-size: 0.7rem;
+            margin: 0;
+            line-height: 1.1;
+        }
+    }
+</style>
+{% endblock %}

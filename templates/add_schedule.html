@@ -1,0 +1,78 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="row justify-content-center">
+    <div class="col-md-8 col-lg-6">
+        <div class="card shadow">
+            <div class="card-body">
+                <h2 class="card-title text-center mb-4">הוסף שיעור חדש</h2>
+                <form method="POST" action="{{ url_for('add_schedule') }}">
+                    <div class="row mb-3">
+                        <div class="col-md-6">
+                            <label for="day" class="form-label">יום</label>
+                            <select class="form-select" id="day" name="day" required>
+                                {% for day in days %}
+                                    <option value="{{ day }}" {% if request.args.get('day') == day %}selected{% endif %}>{{ day }}</option>
+                                {% endfor %}
+                            </select>
+                        </div>
+                        <div class="col-md-3">
+                            <label for="start_time" class="form-label">משעה</label>
+                            <select class="form-select" id="start_time" name="start_time" required>
+                                {% for time in time_slots %}
+                                    <option value="{{ time }}" {% if request.args.get('start_time') == time %}selected{% endif %}>{{ time }}</option>
+                                {% endfor %}
+                            </select>
+                        </div>
+                        <div class="col-md-3">
+                            <label for="end_time" class="form-label">עד שעה</label>
+                            <select class="form-select" id="end_time" name="end_time" required>
+                                {% for i in range(1, time_slots|length) %}
+                                    <option value="{{ time_slots[i] }}" 
+                                            {% if request.args.get('end_time') == time_slots[i] %}selected
+                                            {% elif not request.args.get('end_time') and i == time_slots|length-1 %}selected{% endif %}>
+                                        {{ time_slots[i] }}
+                                    </option>
+                                {% endfor %}
+                            </select>
+                        </div>
+                    </div>
+                    <div class="row mb-3">
+                        <div class="col-md-8">
+                            <label for="subject" class="form-label">מקצוע</label>
+                            <input type="text" class="form-control" id="subject" name="subject" required>
+                        </div>
+                        <div class="col-md-4">
+                            <label for="teacher" class="form-label">מורה</label>
+                            <input type="text" class="form-control" id="teacher" name="teacher" required>
+                        </div>
+                    </div>
+                    <div class="d-grid gap-2 d-md-flex justify-content-md-end">
+                        <a href="{{ url_for('schedule') }}" class="btn btn-secondary me-md-2">ביטול</a>
+                        <button type="submit" class="btn btn-primary">שמור שיעור</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+    // Auto-set end time to be one hour after start time
+    document.getElementById('start_time').addEventListener('change', function() {
+        const startTime = this.value;
+        const endTimeSelect = document.getElementById('end_time');
+        const options = Array.from(endTimeSelect.options);
+        
+        // Find the index of the selected start time
+        const startIndex = options.findIndex(option => option.value === startTime);
+        
+        if (startIndex >= 0 && startIndex < options.length - 1) {
+            // Set end time to one hour after start time
+            endTimeSelect.value = options[startIndex + 1].value;
+        }
+    });
+</script>
+{% endblock %}

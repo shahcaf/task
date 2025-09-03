@@ -169,14 +169,24 @@ function setupEventListeners() {
         });
     }
     
-    // Save button
-    if (saveBtn) {
-        saveBtn.addEventListener('click', saveLesson);
+    // Admin form submission
+    const adminForm = document.getElementById('admin-form');
+    if (adminForm) {
+        adminForm.addEventListener('submit', saveLesson);
     }
     
     // Clear button
     if (clearBtn) {
         clearBtn.addEventListener('click', clearForm);
+    }
+    
+    // Back to schedule button
+    const backToScheduleBtn = document.getElementById('back-to-schedule');
+    if (backToScheduleBtn) {
+        backToScheduleBtn.addEventListener('click', () => {
+            showScheduleView();
+            clearForm();
+        });
     }
     
     // Task form submission
@@ -323,6 +333,9 @@ function showAdminView() {
     if (scheduleView) scheduleView.classList.add('d-none');
     if (adminView) adminView.classList.remove('d-none');
     if (tasksView) tasksView.classList.add('d-none');
+    
+    // Clear form when showing admin view
+    clearForm();
 }
 
 // Show tasks view
@@ -548,52 +561,68 @@ function saveLesson(e) {
     if (e) e.preventDefault();
     
     if (!currentUser || (currentUser.role !== 'admin' && currentUser.role !== 'mod')) {
+        showToast('אין לך הרשאות לערוך שיעורים', 'error');
         return;
     }
     
-    const dayIndex = parseInt(daySelect.value);
-    const timeIndex = parseInt(timeSelect.value);
-    const subject = subjectInput ? subjectInput.value.trim() : '';
-    const teacher = teacherInput ? teacherInput.value.trim() : '';
-    
-    if (!subject || !teacher) {
-        showToast('נא למלא את כל השדות', 'warning');
-        return;
+    try {
+        const dayIndex = parseInt(daySelect.value);
+        const timeIndex = parseInt(timeSelect.value);
+        const subject = subjectInput ? subjectInput.value.trim() : '';
+        const teacher = teacherInput ? teacherInput.value.trim() : '';
+        
+        if (!subject || !teacher) {
+            showToast('נא למלא את כל השדות', 'warning');
+            return;
+        }
+        
+        // Save current state for undo
+        const previousState = {
+            dayIndex,
+            timeIndex,
+            lesson: scheduleData.lessons[dayIndex] && scheduleData.lessons[dayIndex][timeIndex] 
+                ? {...scheduleData.lessons[dayIndex][timeIndex]} 
+                : null
+        };
+        
+        // Update lesson
+        if (!scheduleData.lessons[dayIndex]) {
+            scheduleData.lessons[dayIndex] = [];
+        }
+        scheduleData.lessons[dayIndex][timeIndex] = { subject, teacher };
+        
+        // Save to localStorage
+        saveScheduleData();
+        
+        // Add to change history
+        changeHistory.push(previousState);
+        if (changeHistory.length > MAX_HISTORY) {
+            changeHistory.shift();
+        }
+        
+        // Show success message and update view
+        showToast('השיעור נשמר בהצלחה', 'success');
+        
+        // Clear the form
+        clearForm();
+        
+        // Switch back to schedule view
+        showScheduleView();
+        
+        // Re-render the schedule
+        renderSchedule();
+    } catch (error) {
+        console.error('Error saving lesson:', error);
+        showToast('אירעה שגיאה בשמירת השיעור', 'error');
     }
-    
-    // Save current state for undo
-    const previousState = {
-        dayIndex,
-        timeIndex,
-        lesson: scheduleData.lessons[dayIndex] && scheduleData.lessons[dayIndex][timeIndex] 
-            ? {...scheduleData.lessons[dayIndex][timeIndex]} 
-            : null
-    };
-    
-    // Update lesson
-    if (!scheduleData.lessons[dayIndex]) {
-        scheduleData.lessons[dayIndex] = [];
-    }
-    scheduleData.lessons[dayIndex][timeIndex] = { subject, teacher };
-    
-    // Save to localStorage
-    saveScheduleData();
-    
-    // Add to change history
-    changeHistory.push(previousState);
-    if (changeHistory.length > MAX_HISTORY) {
-        changeHistory.shift();
-    }
-    
-    // Show success message and update view
-    showToast('השיעור נשמר בהצלחה', 'success');
-    renderSchedule();
 }
 
 // Clear form
 function clearForm() {
     if (subjectInput) subjectInput.value = '';
     if (teacherInput) teacherInput.value = '';
+    if (daySelect) daySelect.value = '';
+    if (timeSelect) timeSelect.value = '';
 }
 
 // Undo last change

@@ -125,6 +125,162 @@ const MAX_HISTORY = 10;
 // Notices data
 let notices = [];
 
+// Load notices from localStorage
+function loadNotices() {
+    const savedNotices = localStorage.getItem('notices');
+    if (savedNotices) {
+        try {
+            notices = JSON.parse(savedNotices);
+        } catch (e) {
+            console.error('Error parsing notices:', e);
+            notices = [];
+        }
+    }
+    renderNotices();
+}
+
+// Render notices to the UI
+function renderNotices() {
+    if (!noticesContainer) return;
+    
+    if (notices.length === 0) {
+        noNotices.classList.remove('d-none');
+        noticesContainer.innerHTML = '';
+        return;
+    }
+    
+    noNotices.classList.add('d-none');
+    
+    const noticesHtml = notices.map(notice => `
+        <div class="card mb-3 notice-card">
+            <div class="card-header d-flex justify-content-between align-items-center">
+                <h5 class="card-title mb-0">${escapeHtml(notice.title)}</h5>
+                ${currentUser && (currentUser.role === 'admin' || currentUser.role === 'mod' || currentUser.username === notice.author) ? `
+                    <button class="btn btn-sm btn-outline-danger delete-notice" data-id="${notice.id}">
+                        <i class="fas fa-trash"></i>
+                    </button>
+                ` : ''}
+            </div>
+            <div class="card-body">
+                <p class="card-text">${formatNoticeContent(notice.content)}</p>
+                <p class="card-text">
+                    <small class="text-muted">
+                        פורסם על ידי ${escapeHtml(notice.author)} • ${formatDate(notice.createdAt)}
+                    </small>
+                </p>
+            </div>
+        </div>
+    `).join('');
+    
+    noticesContainer.innerHTML = noticesHtml;
+    
+    // Add event listeners to delete buttons
+    document.querySelectorAll('.delete-notice').forEach(button => {
+        button.addEventListener('click', (e) => {
+            const noticeId = e.currentTarget.dataset.id;
+            deleteNotice(noticeId);
+        });
+    });
+}
+
+// Helper function to escape HTML
+function escapeHtml(unsafe) {
+    if (!unsafe) return '';
+    return unsafe
+        .toString()
+        .replace(/&/g, '&amp;')
+        .replace(/</g, '&lt;')
+        .replace(/>/g, '&gt;')
+        .replace(/"/g, '&quot;')
+        .replace(/'/g, '&#039;');
+}
+
+// Format notice content with line breaks
+function formatNoticeContent(content) {
+    return escapeHtml(content).replace(/\n/g, '<br>');
+}
+
+// Format date to Hebrew locale
+function formatDate(dateString) {
+    const options = { 
+        year: 'numeric', 
+        month: 'long', 
+        day: 'numeric',
+        hour: '2-digit',
+        minute: '2-digit'
+    };
+    return new Date(dateString).toLocaleDateString('he-IL', options);
+}
+
+// Delete a notice
+function deleteNotice(noticeId) {
+    if (!currentUser) return;
+    
+    const noticeIndex = notices.findIndex(n => n.id === noticeId);
+    if (noticeIndex === -1) return;
+    
+    const notice = notices[noticeIndex];
+    
+    // Check if user is admin, mod, or the author
+    if (currentUser.role !== 'admin' && currentUser.role !== 'mod' && currentUser.username !== notice.author) {
+        showToast('אין לך הרשאות למחוק הודעה זו', 'error');
+        return;
+    }
+    
+    if (confirm('האם אתה בטוח שברצונך למחוק הודעה זו?')) {
+        notices.splice(noticeIndex, 1);
+        saveNotices();
+        renderNotices();
+        showToast('ההודעה נמחקה בהצלחה', 'success');
+    }
+}
+
+// Save notices to localStorage
+function saveNotices() {
+    localStorage.setItem('notices', JSON.stringify(notices));
+}
+
+// Handle new notice form submission
+function handleNewNotice(e) {
+    e.preventDefault();
+    
+    if (!currentUser) {
+        showToast('יש להתחבר כדי לפרסם הודעה', 'error');
+        return;
+    }
+    
+    const title = noticeTitleInput.value.trim();
+    const content = noticeContentInput.value.trim();
+    
+    if (!title || !content) {
+        showToast('נא למלא את כל השדות', 'warning');
+        return;
+    }
+    
+    const newNotice = {
+        id: Date.now().toString(),
+        title,
+        content,
+        author: currentUser.username,
+        authorName: currentUser.name,
+        createdAt: new Date().toISOString()
+    };
+    
+    notices.unshift(newNotice); // Add to beginning of array
+    saveNotices();
+    
+    // Reset form
+    newNoticeForm.reset();
+    addNoticeForm.classList.add('d-none');
+    addNoticeBtn.classList.remove('d-none');
+    
+    // Show success message
+    showToast('ההודעה פורסמה בהצלחה', 'success');
+    
+    // Re-render notices
+    renderNotices();
+}
+
 // Initialize the application
 function init() {
     // Initialize global namespace if it doesn't exist

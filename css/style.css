@@ -1,3 +1,69 @@
+/* Notice Board Styles */
+.notice-card {
+    border-right: 4px solid #3498db;
+    margin-bottom: 1.5rem;
+    transition: transform 0.2s, box-shadow 0.2s;
+    border-radius: 0.5rem;
+    overflow: hidden;
+}
+
+.notice-card:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+}
+
+.notice-card .card-header {
+    background-color: #f8f9fa;
+    border-bottom: 1px solid rgba(0, 0, 0, 0.05);
+    padding: 1rem 1.25rem;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.notice-card .card-title {
+    margin: 0;
+    color: #2c3e50;
+    font-weight: 600;
+}
+
+.notice-card .card-body {
+    padding: 1.25rem;
+}
+
+.notice-card .card-text {
+    color: #34495e;
+    line-height: 1.7;
+    white-space: pre-line;
+}
+
+.notice-card .card-footer {
+    background-color: #f8f9fa;
+    border-top: 1px solid rgba(0, 0, 0, 0.05);
+    padding: 0.75rem 1.25rem;
+    font-size: 0.85rem;
+    color: #7f8c8d;
+}
+
+.notice-actions {
+    display: flex;
+    gap: 0.5rem;
+}
+
+/* Responsive adjustments */
+@media (max-width: 768px) {
+    .notice-card .card-header {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 0.5rem;
+    }
+    
+    .notice-actions {
+        width: 100%;
+        justify-content: flex-end;
+    }
+}
+
 /* General Styles */
 body {
     font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;

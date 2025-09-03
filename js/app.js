@@ -1,28 +1,38 @@
 // DOM Elements
-const loginPage = document.getElementById('login-page');
-const app = document.getElementById('app');
 const loginForm = document.getElementById('login-form');
 const loginError = document.getElementById('login-error');
+const app = document.getElementById('app');
+const loginPage = document.getElementById('login-page');
 const welcomeUser = document.getElementById('welcome-user');
 const logoutLink = document.getElementById('logout-link');
 const scheduleLink = document.getElementById('schedule-link');
 const manageLink = document.getElementById('admin-link');
 const tasksLink = document.getElementById('tasks-link');
+const noticeBoardLink = document.getElementById('notice-board-link');
 const scheduleView = document.getElementById('schedule-view');
 const adminView = document.getElementById('admin-view');
 const tasksView = document.getElementById('tasks-view');
+const noticeBoardView = document.getElementById('notice-board-view');
 const scheduleBody = document.getElementById('schedule-body');
+const saveBtn = document.getElementById('save-btn');
+const clearBtn = document.getElementById('clear-btn');
 const daySelect = document.getElementById('day-select');
 const timeSelect = document.getElementById('time-select');
 const subjectInput = document.getElementById('subject-input');
 const teacherInput = document.getElementById('teacher-input');
-const saveBtn = document.getElementById('save-btn');
-const clearBtn = document.getElementById('clear-btn');
 const taskForm = document.getElementById('add-task-form');
 const taskInput = document.getElementById('task-input');
 const taskCategory = document.getElementById('task-category');
 const taskList = document.getElementById('task-list');
 const filterButtons = document.querySelectorAll('.filters button');
+const addNoticeBtn = document.getElementById('add-notice-btn');
+const addNoticeForm = document.getElementById('add-notice-form');
+const newNoticeForm = document.getElementById('new-notice-form');
+const noticeTitleInput = document.getElementById('notice-title');
+const noticeContentInput = document.getElementById('notice-content');
+const cancelNoticeBtn = document.getElementById('cancel-notice');
+const noticesContainer = document.getElementById('notices-container');
+const noNotices = document.getElementById('no-notices');
 
 // Sample users (in a real app, this would be server-side)
 const users = [
@@ -112,6 +122,9 @@ let scheduleData = {
 let changeHistory = [];
 const MAX_HISTORY = 10;
 
+// Notices data
+let notices = [];
+
 // Initialize the application
 function init() {
     // Initialize global namespace if it doesn't exist
@@ -124,6 +137,9 @@ function init() {
     
     // Load saved schedule data if exists
     loadScheduleData();
+    
+    // Load notices from localStorage
+    loadNotices();
     
     // Set up event listeners
     setupEventListeners();
@@ -169,6 +185,13 @@ function setupEventListeners() {
         });
     }
     
+    if (noticeBoardLink) {
+        noticeBoardLink.addEventListener('click', (e) => {
+            e.preventDefault();
+            showNoticeBoardView();
+        });
+    }
+    
     // Admin form submission
     const adminForm = document.getElementById('admin-form');
     if (adminForm) {
@@ -192,6 +215,26 @@ function setupEventListeners() {
     // Task form submission
     if (taskForm) {
         taskForm.addEventListener('submit', addTask);
+    }
+    
+    // Notice board buttons
+    if (addNoticeBtn) {
+        addNoticeBtn.addEventListener('click', () => {
+            addNoticeForm.classList.remove('d-none');
+            addNoticeBtn.classList.add('d-none');
+        });
+    }
+    
+    if (cancelNoticeBtn) {
+        cancelNoticeBtn.addEventListener('click', () => {
+            addNoticeForm.classList.add('d-none');
+            addNoticeBtn.classList.remove('d-none');
+            newNoticeForm.reset();
+        });
+    }
+    
+    if (newNoticeForm) {
+        newNoticeForm.addEventListener('submit', handleNewNotice);
     }
     
     // Filter buttons
@@ -293,29 +336,40 @@ function showApp() {
     if (loginPage) loginPage.classList.add('d-none');
     if (app) app.classList.remove('d-none');
     
-// Update welcome message
-if (welcomeUser && currentUser) {
-welcomeUser.textContent = `שלום, ${currentUser.name}`;
-}
+    // Update welcome message
+    if (welcomeUser && currentUser) {
+        welcomeUser.textContent = `שלום, ${currentUser.name}`;
+    }
     
-// Show/Hide admin link based on user role
-if (adminLink) {
-adminLink.style.display = (currentUser.role === 'admin' || currentUser.role === 'mod') ? 'block' : 'none';
-}
+    // Show/Hide admin link based on user role
+    if (adminLink) {
+        if (currentUser && (currentUser.role === 'admin' || currentUser.role === 'mod')) {
+            adminLink.classList.remove('d-none');
+        } else {
+            adminLink.classList.add('d-none');
+        }
+    }
     
-// Show tasks link for all users
-if (tasksLink) {
-tasksLink.style.display = 'block';
-}
+    // Show tasks link for all users
+    if (tasksLink) {
+        tasksLink.style.display = 'block';
+    }
     
-// Show schedule view by default
-showScheduleView();
+    // Show notice board link for all users
+    if (noticeBoardLink) {
+        noticeBoardLink.style.display = 'block';
+    }
+    
+    // Show schedule view by default
+    showScheduleView();
 }
 
 // Show schedule view
 function showScheduleView() {
     // Hide other views
     if (adminView) adminView.classList.add('d-none');
+    if (tasksView) tasksView.classList.add('d-none');
+    if (noticeBoardView) noticeBoardView.classList.add('d-none');
     if (scheduleView) scheduleView.classList.remove('d-none');
     
     // Render the schedule
@@ -344,11 +398,38 @@ function showTasksView() {
     if (scheduleView) scheduleView.classList.add('d-none');
     if (adminView) adminView.classList.add('d-none');
     if (tasksView) tasksView.classList.remove('d-none');
+    if (noticeBoardView) noticeBoardView.classList.add('d-none');
     
     // Render tasks
     renderTasks();
 }
+
+// Show notice board view
+function showNoticeBoardView() {
+    // Hide other views
+    if (scheduleView) scheduleView.classList.add('d-none');
+    if (adminView) adminView.classList.add('d-none');
+    if (tasksView) tasksView.classList.add('d-none');
+    if (noticeBoardView) noticeBoardView.classList.remove('d-none');
     
+    // Show/hide add notice button based on user role
+    if (addNoticeBtn) {
+        if (currentUser && (currentUser.role === 'admin' || currentUser.role === 'mod')) {
+            addNoticeBtn.classList.remove('d-none');
+        } else {
+            addNoticeBtn.classList.add('d-none');
+        }
+    }
+    
+    // Hide add notice form if visible
+    if (addNoticeForm) {
+        addNoticeForm.classList.add('d-none');
+    }
+    
+    // Render notices
+    renderNotices();
+}
+
 // Load schedule data from localStorage
 function loadScheduleData() {
     const savedData = localStorage.getItem('scheduleData');

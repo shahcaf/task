@@ -63,6 +63,9 @@
                         <li class="nav-item">
                             <a class="nav-link" href="#" id="tasks-link">רשימת משימות</a>
                         </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="#" id="notice-board-link">לוח מודעות</a>
+                        </li>
                     </ul>
                     <ul class="navbar-nav">
                         <li class="nav-item">
@@ -154,6 +157,45 @@
                                 </button>
                             </div>
                         </form>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Notice Board View -->
+            <div id="notice-board-view" class="d-none">
+                <div class="d-flex justify-content-between align-items-center mb-4">
+                    <h2 class="mb-0">לוח מודעות</h2>
+                    <button id="add-notice-btn" class="btn btn-primary d-none">
+                        <i class="fas fa-plus me-1"></i>הודעה חדשה
+                    </button>
+                </div>
+                
+                <!-- Add Notice Form (initially hidden) -->
+                <div id="add-notice-form" class="card mb-4 d-none">
+                    <div class="card-body">
+                        <form id="new-notice-form">
+                            <div class="mb-3">
+                                <label for="notice-title" class="form-label">כותרת</label>
+                                <input type="text" class="form-control" id="notice-title" required>
+                            </div>
+                            <div class="mb-3">
+                                <label for="notice-content" class="form-label">תוכן ההודעה</label>
+                                <textarea class="form-control" id="notice-content" rows="4" required></textarea>
+                            </div>
+                            <div class="d-flex gap-2">
+                                <button type="submit" class="btn btn-primary">פרסם הודעה</button>
+                                <button type="button" id="cancel-notice" class="btn btn-secondary">ביטול</button>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+                
+                <!-- Notices Container -->
+                <div id="notices-container">
+                    <!-- Notices will be loaded here by JavaScript -->
+                    <div class="text-center text-muted py-5" id="no-notices">
+                        <i class="fas fa-clipboard fa-3x mb-3"></i>
+                        <p class="mb-0">אין הודעות להצגה</p>
                     </div>
                 </div>
             </div>
